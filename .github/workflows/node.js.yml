@@ -30,9 +30,6 @@ jobs:
       run: |
         npm install
         npm ci || npm install
-    
-    - name: Setup test database
-      run: npm run setup-test-db
       
     - name: Run tests
       run: npm test

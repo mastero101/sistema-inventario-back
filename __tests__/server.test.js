@@ -1,8 +1,17 @@
 const request = require('supertest');
 const { app, server, closeServer } = require('../server');
+const db = require('../db');
 
-// Cerrar el servidor después de todas las pruebas
+// Setup and teardown
+beforeAll(async () => {
+  // Ensure database connection is ready
+  await new Promise(resolve => setTimeout(resolve, 500));
+});
+
 afterAll(async () => {
+  if (db.pool) {
+    await db.pool.end();
+  }
   await closeServer();
 });
 
