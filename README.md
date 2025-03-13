@@ -14,31 +14,45 @@ Backend para un sistema de gestión de inventario desarrollado con Node.js, Expr
 - PostgreSQL (o una cuenta en Neon.tech )
 - npm (incluido con Node.js)
 ## 🛠️ Instalación
-1. Clonar el repositorio:
-git clone https://github.com/mastero101/sistema-inventario-back.git cd sistema-inventario-back
+1. **Clonar el repositorio:**
+```bash
+git clone https://github.com/mastero101/sistema-inventario-back.git
+cd sistema-inventario-back
+```
 
 2. Instalar dependencias:
+```bash
 npm install
+```
 
 3. Configurar variables de entorno:
 Crear archivo .env en la raíz del proyecto:
-
+```bash
 DATABASE_URL=<URL_DE_NEON>
 PORT=3005
 NODE_ENV=development
+```
 
 4. Inicializar la base de datos:
+```bash
 npm run init-db
+```
 
 ## 🚀 Uso
 ### Desarrollo
+```bash
 npm run dev
+```
 
 ### Producción
+```bash
 npm start
+```
 
 ### Pruebas
+```bash
 npm test
+```
 
 ## 📚 API Endpoints
 ### Inventario
@@ -65,22 +79,32 @@ Las imágenes se almacenan localmente en la carpeta uploads/ . Asegúrate de que
 El proyecto incluye pruebas automatizadas:
 
 # Ejecutar todas las pruebas
+```bash
 npm test
+```
 
 # Ejecutar pruebas con coverage
+```bash
 npm run test:coverage
+```
 
 # Ejecutar pruebas en modo watch
+```bash
 npm run test:watch
+```
 
 ## 📦 Despliegue
 El backend está configurado para desplegarse en Vercel:
 
 1. Instalar Vercel CLI:
+```bash
 npm install -g vercel
+```
 
 2. Desplegar:
+```bash
 vercel
+```
 
 ## 🛡️ Variables de Entorno Variable Descripción Requerida DATABASE_URL
 
@@ -116,7 +140,7 @@ Si encuentras un bug o tienes una sugerencia, por favor abre un issue en GitHub.
 - CI/CD: GitHub Actions
 ## 📊 Estructura del Proyecto
 sistema-inventario-back/
-├── tests /           # Pruebas unitarias
+├── __tests__/           # Pruebas unitarias
 ├── config/             # Configuración
 ├── controllers/        # Controladores
 ├── db/                # Configuración de base de datos
