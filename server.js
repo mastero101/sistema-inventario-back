@@ -221,28 +221,39 @@ app.get('/health', generateHealthPage);
 app.use(errorHandler);
 
 // Iniciar servidor
-// Initialize database before starting server
-const startServer = async () => {
+// Initialize database and create app
+const initializeApp = async () => {
+  try {
+    await createTables();
+    console.log('Database initialized successfully');
+  } catch (error) {
+    console.error('Database initialization failed:', error);
+  }
+};
+
+// Initialize database and start server based on environment
+if (process.env.NODE_ENV !== 'production') {
+  // For local development
+  startServer();
+} else {
+  // For production (Vercel)
+  initializeApp();
+}
+
+// Modify the exports
+module.exports = app;
+
+// Keep startServer function for local development
+async function startServer() {
   try {
     await createTables();
     const server = app.listen(PORT, () => {
       console.log(`Servidor corriendo en el puerto ${PORT}`);
     });
 
-    const closeServer = () => {
-      return new Promise((resolve) => {
-        server.close(() => {
-          resolve();
-        });
-      });
-    };
-
-    return { app, server, closeServer };
+    return { app, server };
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
   }
-};
-
-// Export for testing
-module.exports = startServer();
+}
