@@ -2,20 +2,12 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const axios = require('axios');
+const FormData = require('form-data');
 const inventoryController = require('../controllers/inventoryController');
 
-// Configuración de multer para subir imágenes
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../uploads'));
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-  }
-});
-
+// Configuración de multer para memoria en lugar de disco
+const storage = multer.memoryStorage();
 const upload = multer({ 
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // Límite de 5MB
@@ -31,16 +23,49 @@ const upload = multer({
   }
 });
 
+// Middleware para subir imagen a ImgBB
+const uploadToImgBB = async (req, res, next) => {
+  if (!req.file) {
+    return next();
+  }
+
+  try {
+    // Convertir la imagen a base64
+    const base64Image = req.file.buffer.toString('base64');
+
+    // Crear el form data
+    const formData = new FormData();
+    formData.append('image', base64Image);
+
+    // Subir imagen a ImgBB
+    const response = await axios.post('https://api.imgbb.com/1/upload', formData, {
+      params: {
+        key: process.env.IMGBB_API_KEY
+      },
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
+    // Agregar la URL de la imagen al request
+    req.imageData = {
+      url: response.data.data.url,
+      deleteUrl: response.data.data.delete_url,
+      thumbnailUrl: response.data.data.thumb?.url
+    };
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Rutas
 router.get('/', inventoryController.getAllItems);
 router.get('/:id', inventoryController.getItemById);
-router.post('/', upload.single('imagen'), inventoryController.createItem);
-router.put('/:id', upload.single('imagen'), inventoryController.updateItem);
+router.post('/', upload.single('imagen'), uploadToImgBB, inventoryController.createItem);
+router.put('/:id', upload.single('imagen'), uploadToImgBB, inventoryController.updateItem);
 router.delete('/:id', inventoryController.deleteItem);
-
-// Añadir esta ruta al archivo existente, justo antes de module.exports = router;
-
-// Ruta para búsqueda avanzada
 router.get('/search', inventoryController.searchItems);
 
 module.exports = router;

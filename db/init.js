@@ -2,28 +2,36 @@ const db = require('./index');
 
 const createTables = async () => {
   try {
-    // Crear tabla de inventario
     await db.query(`
       CREATE TABLE IF NOT EXISTS inventory_items (
-        id VARCHAR(10) PRIMARY KEY,
-        tipo VARCHAR(50) NOT NULL,
-        marca VARCHAR(50) NOT NULL,
+        id SERIAL PRIMARY KEY,
+        tipo VARCHAR(100) NOT NULL,
+        marca VARCHAR(100) NOT NULL,
         modelo VARCHAR(100) NOT NULL,
-        serial VARCHAR(50) UNIQUE NOT NULL,
-        estado VARCHAR(20) NOT NULL CHECK (estado IN ('Disponible', 'Asignado', 'Mantenimiento', 'Dañado')),
+        serial VARCHAR(100) UNIQUE NOT NULL,
+        estado VARCHAR(50) NOT NULL,
         asignado_a VARCHAR(100),
         ubicacion VARCHAR(100) NOT NULL,
-        fecha_registro DATE NOT NULL,
+        fecha_registro DATE NOT NULL DEFAULT CURRENT_DATE,
         ultimo_mantenimiento DATE,
-        departamento VARCHAR(50),
-        imagen VARCHAR(255)
-      );
+        departamento VARCHAR(100),
+        imagen VARCHAR(255),
+        imagen_thumbnail VARCHAR(255),
+        imagen_delete_url VARCHAR(255)
+      )
     `);
-
-    console.log('Tablas creadas correctamente');
+    console.log('Database tables created successfully');
   } catch (error) {
-    console.error('Error al crear las tablas:', error);
+    console.error('Error creating database tables:', error);
+    throw error;
   }
 };
 
-createTables();
+// Execute if this file is run directly
+if (require.main === module) {
+  createTables()
+    .then(() => process.exit(0))
+    .catch(() => process.exit(1));
+}
+
+module.exports = createTables;

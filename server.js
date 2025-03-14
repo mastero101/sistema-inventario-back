@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const errorHandler = require('./middleware/errorHandler');
+const createTables = require('./db/init');
 
 // Importar rutas
 const inventoryRoutes = require('./routes/inventory');
@@ -220,19 +221,28 @@ app.get('/health', generateHealthPage);
 app.use(errorHandler);
 
 // Iniciar servidor
-// Modificar la parte final del archivo
-const server = app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
-});
-
-// Función para cerrar el servidor limpiamente
-const closeServer = () => {
-  return new Promise((resolve) => {
-    server.close(() => {
-      resolve();
+// Initialize database before starting server
+const startServer = async () => {
+  try {
+    await createTables();
+    const server = app.listen(PORT, () => {
+      console.log(`Servidor corriendo en el puerto ${PORT}`);
     });
-  });
+
+    const closeServer = () => {
+      return new Promise((resolve) => {
+        server.close(() => {
+          resolve();
+        });
+      });
+    };
+
+    return { app, server, closeServer };
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
 };
 
-// Exportar para testing
-module.exports = { app, server, closeServer };
+// Export for testing
+module.exports = startServer();
