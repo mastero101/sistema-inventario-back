@@ -8,14 +8,14 @@ const inventoryController = require('../controllers/inventoryController');
 
 // Configuración de multer para memoria en lugar de disco
 const storage = multer.memoryStorage();
-const upload = multer({ 
+const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // Límite de 5MB
   fileFilter: (req, file, cb) => {
     const filetypes = /jpeg|jpg|png|gif/;
     const mimetype = filetypes.test(file.mimetype);
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    
+
     if (mimetype && extname) {
       return cb(null, true);
     }
@@ -62,10 +62,10 @@ const uploadToImgBB = async (req, res, next) => {
 
 // Rutas
 router.get('/', inventoryController.getAllItems);
+router.get('/search', inventoryController.searchItems);
 router.get('/:id', inventoryController.getItemById);
 router.post('/', upload.single('imagen'), uploadToImgBB, inventoryController.createItem);
 router.put('/:id', upload.single('imagen'), uploadToImgBB, inventoryController.updateItem);
 router.delete('/:id', inventoryController.deleteItem);
-router.get('/search', inventoryController.searchItems);
 
 module.exports = router;

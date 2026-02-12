@@ -9,6 +9,7 @@ const createTables = require('./db/init');
 const inventoryRoutes = require('./routes/inventory');
 const exportRoutes = require('./routes/export');
 const statsRoutes = require('./routes/stats');
+const maintenanceRoutes = require('./routes/maintenance');
 
 // Configuración
 dotenv.config();
@@ -27,6 +28,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/export', exportRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/maintenance', maintenanceRoutes);
 
 // Función para generar la página de estado del sistema
 const generateHealthPage = (req, res) => {
@@ -35,11 +37,11 @@ const generateHealthPage = (req, res) => {
   const hours = Math.floor((uptime % 86400) / 3600);
   const minutes = Math.floor((uptime % 3600) / 60);
   const seconds = Math.floor(uptime % 60);
-  
+
   const formattedUptime = `${days}d ${hours}h ${minutes}m ${seconds}s`;
   const memoryUsage = process.memoryUsage();
   const memoryUsedMB = Math.round(memoryUsage.rss / 1024 / 1024 * 100) / 100;
-  
+
   const html = `
   <!DOCTYPE html>
   <html lang="es">
@@ -209,7 +211,7 @@ const generateHealthPage = (req, res) => {
   </body>
   </html>
   `;
-  
+
   res.send(html);
 };
 

@@ -9,8 +9,12 @@ const createTables = async () => {
         marca VARCHAR(100) NOT NULL,
         modelo VARCHAR(100) NOT NULL,
         serial VARCHAR(100) UNIQUE NOT NULL,
+        inventory_number VARCHAR(100),
+        description TEXT,
+        source VARCHAR(100),
         estado VARCHAR(50) NOT NULL,
         asignado_a VARCHAR(100),
+        assigned_sub_area VARCHAR(100),
         ubicacion VARCHAR(100) NOT NULL,
         fecha_registro DATE NOT NULL DEFAULT CURRENT_DATE,
         ultimo_mantenimiento DATE,
@@ -18,7 +22,18 @@ const createTables = async () => {
         imagen VARCHAR(255),
         imagen_thumbnail VARCHAR(255),
         imagen_delete_url VARCHAR(255)
-      )
+      );
+
+      CREATE TABLE IF NOT EXISTS maintenance_reports (
+        id SERIAL PRIMARY KEY,
+        item_id INTEGER REFERENCES inventory_items(id) ON DELETE CASCADE,
+        fecha DATE NOT NULL DEFAULT CURRENT_DATE,
+        tipo_mantenimiento VARCHAR(100),
+        descripcion TEXT,
+        tecnico VARCHAR(100),
+        costo DECIMAL(10, 2),
+        notas TEXT
+      );
     `);
     console.log('Database tables created successfully');
   } catch (error) {
